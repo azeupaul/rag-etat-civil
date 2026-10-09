@@ -2,20 +2,26 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>Flask & HTMX</title>
+        <title>RAG État Civil Cameroun</title>
         <!-- Chargement d'HTMX -->
         <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js" 
             integrity="sha384-2OatzQy1H+Zd/IIrjr1TcuDGqLXeHhbooAyJY1KdQMKnr4LZ22k31GBLdYKHmVjg"
             crossorigin="anonymous"></script>
+            <script src="https://cdn.tailwindcss.com"></script>
     </head>
-    <body>
-        <h1>Mon application Flask et HTMX</h1>
-        
-        <!-- Zone cible pour le contenu dynamique -->
-        <div id="resultat">
-            <button hx-post="/" hx-target="#resultat" hx-swap="outerHTML">
-                Clique-moi
-            </button>
+    <body class="bg-gray-50 p-8">
+        <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow">
+            <h1 class="text-2xl font-bold text-gray-800 mb-4">RAG État Civil - Cameroun</h1>
+            
+            <form hx-post="/search" hx-target="#results" hx-swap="innerHTML">
+                <input type="text" name="query" placeholder="Posez une question sur la Loi 2024/016..." 
+                    class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <button type="submit" class="mt-3 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">
+                    Rechercher
+                </button>
+            </form>
+
+            <div id="results"></div>
         </div>
     </body>
 </html>
