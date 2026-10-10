@@ -8,3 +8,11 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Environnement local et caches
+.env
+.ruff_cache/
+.pytest_cache/
+
+# Index généré (reconstruit par `make index`)
+data/index/

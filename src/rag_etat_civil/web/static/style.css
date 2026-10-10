@@ -1,0 +1,243 @@
+/* Feuille de style écrite à la main : pas de framework, pas de build. */
+
+:root {
+  --bg: #faf9f6;
+  --surface: #ffffff;
+  --text: #1d2420;
+  --muted: #55605a;
+  --border: #d9ddd8;
+  --accent: #0f6b3f;
+  --accent-text: #ffffff;
+  --accent-hover: #0b5632;
+  --notice-bg: #fff6dd;
+  --notice-border: #e3c262;
+  --error-bg: #fdecec;
+  --error-border: #d98686;
+  --focus: #1a56db;
+
+  --radius: 0.5rem;
+  --measure: 42rem;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121714;
+    --surface: #1a211d;
+    --text: #e8ece9;
+    --muted: #a3aea7;
+    --border: #2f3a34;
+    --accent: #3fb77a;
+    --accent-text: #0b1410;
+    --accent-hover: #5fcb92;
+    --notice-bg: #2b2412;
+    --notice-border: #7a6420;
+    --error-bg: #301a1a;
+    --error-border: #8a4a4a;
+    --focus: #8ab4ff;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--measure);
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+main {
+  flex: 1;
+  padding-block: 1.5rem 3rem;
+}
+
+/* Accessibilité : lien d'évitement, focus visible */
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -4rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--focus);
+  border-radius: var(--radius);
+  z-index: 10;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* En-tête et pied de page */
+.site-header {
+  padding-block: 2rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  line-height: 1.2;
+}
+
+.lead {
+  margin: 0;
+  color: var(--muted);
+}
+
+.site-footer {
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+/* Avertissement */
+.notice {
+  margin: 0 0 1.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--notice-bg);
+  border: 1px solid var(--notice-border);
+  border-radius: var(--radius);
+}
+
+/* Formulaire */
+.ask-form label {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-weight: 600;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  resize: vertical;
+}
+
+textarea::placeholder {
+  color: var(--muted);
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+button {
+  padding: 0.625rem 1.25rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--accent-text);
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--accent-hover);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Indicateur de chargement htmx (les styles par défaut de htmx sont désactivés) */
+.htmx-indicator {
+  color: var(--muted);
+  opacity: 0;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  opacity: 1;
+}
+
+/* Résultats */
+#resultat {
+  margin-top: 1.5rem;
+}
+
+.card {
+  margin: 0 0 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+}
+
+.card-error {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+}
+
+.question {
+  margin: 0 0 0.75rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .htmx-indicator {
+    transition: opacity 150ms ease-in;
+  }
+}

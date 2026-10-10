@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p class="notice" role="note">
+  <strong>Outil de démonstration, ne remplace pas un avis juridique.</strong>
+  Seul le texte publié au Journal Officiel fait foi. Cette démo peut être lente ou indisponible par moments.
+</p>
+
+<form class="ask-form" method="post" action="{{ url_for('ask') }}"
+      hx-post="{{ url_for('ask') }}" hx-target="#resultat" hx-swap="innerHTML"
+      hx-indicator="#chargement" hx-disabled-elt="find button">
+  <label for="question">Votre question</label>
+  <textarea id="question" name="question" rows="3" maxlength="{{ max_question_length }}" required
+            placeholder="Par exemple : dans quel délai faut-il déclarer une naissance ?"
+            >{{ question or "" }}</textarea>
+  <div class="form-actions">
+    <button type="submit">Poser la question</button>
+    <span id="chargement" class="htmx-indicator" role="status">Recherche en cours…</span>
+  </div>
+</form>
+
+<section id="resultat" aria-live="polite" aria-label="Réponse">
+  {% if partial %}{% include partial %}{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="htmx-config" content='{{ htmx_config }}'>
+  <title>{% block title %}Loi 2024/016 : questions-réponses{% endblock %}</title>
+  <meta name="description" content="Démo : posez une question sur la loi n° 2024/016 du 23 décembre 2024 portant organisation du système d'enregistrement des faits d'état civil au Cameroun et obtenez une réponse avec les articles cités.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='vendor/htmx.min.js') }}" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenu">Aller au contenu</a>
+  <header class="site-header">
+    <div class="wrap">
+      <p class="eyebrow">Démonstration</p>
+      <h1>Loi n° 2024/016, état civil au Cameroun</h1>
+      <p class="lead">Posez une question sur la loi du 23 décembre 2024 portant organisation du système d'enregistrement des faits d'état civil. La réponse cite les articles retrouvés dans le texte.</p>
+    </div>
+  </header>
+
+  <main id="contenu" class="wrap">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Projet indépendant, sans lien avec un organisme public. Le texte de la loi est la copie certifiée conforme publiée par la Présidence de la République. Code sous licence MIT. Version {{ app_version }}.</p>
+    </div>
+  </footer>
+</body>
+</html>
