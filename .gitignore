@@ -13,6 +13,7 @@ wheels/
 .env
 .ruff_cache/
 .pytest_cache/
+.cache
 
 # Index généré (reconstruit par `make index`)
 data/index/

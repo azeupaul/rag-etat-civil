@@ -15,10 +15,15 @@ OFFICIAL_SOURCE_URL = (
     "https://prc.cm/fr/multimedia/documents/10257-loi-n-2024-016-du-23-12-2024-web"
 )
 
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
 
 def _default_data_dir() -> Path:
-    # <repository root>/data, starting from src/rag_etat_civil/config.py
-    return Path(__file__).resolve().parents[2] / "data"
+    return _REPO_ROOT / "data"
+
+
+def _default_model_cache_dir() -> Path:
+    return _REPO_ROOT / ".cache" / "models"
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,6 +33,9 @@ class Settings:
     debug: bool = False
     max_question_length: int = 500
     data_dir: Path = field(default_factory=_default_data_dir)
+    embedder: str = "fastembed"
+    embedding_model: str = "intfloat/multilingual-e5-large"
+    embedding_cache_dir: Path = field(default_factory=_default_model_cache_dir)
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -40,4 +48,9 @@ class Settings:
                 os.environ.get("MAX_QUESTION_LENGTH", defaults.max_question_length)
             ),
             data_dir=Path(os.environ.get("DATA_DIR", defaults.data_dir)),
+            embedder=os.environ.get("EMBEDDER", defaults.embedder),
+            embedding_model=os.environ.get("EMBEDDING_MODEL", defaults.embedding_model),
+            embedding_cache_dir=Path(
+                os.environ.get("EMBEDDING_CACHE_DIR", defaults.embedding_cache_dir)
+            ),
         )
