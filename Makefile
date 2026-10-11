@@ -17,6 +17,9 @@ format:
 test:
 	uv run pytest
 
+test-model:
+	uv run pytest -m model
+
 check: lint test
 
 .PHONY: ingest

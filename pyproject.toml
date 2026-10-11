@@ -50,4 +50,7 @@ select = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra"
+addopts = "-ra -m 'not model'"
+markers = [
+    "model:  needs the real embedding model (about 2.2 GB, run with `make test-model`)",
+]
