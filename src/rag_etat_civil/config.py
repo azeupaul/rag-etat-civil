@@ -10,6 +10,11 @@ from dotenv import load_dotenv
 
 _TRUE_VALUES = {"1", "true", "yes", "on"}
 
+# Page of the official scanned PDF, on the website of the Presidency of the Republic.
+OFFICIAL_SOURCE_URL = (
+    "https://prc.cm/fr/multimedia/documents/10257-loi-n-2024-016-du-23-12-2024-web"
+)
+
 
 def _default_data_dir() -> Path:
     # <repository root>/data, starting from src/rag_etat_civil/config.py

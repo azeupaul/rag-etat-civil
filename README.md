@@ -4,7 +4,8 @@ Démo d'un assistant de questions-réponses **avec citations d'articles** sur la
 23 décembre 2024 portant organisation du système d'enregistrement des faits d'état civil au Cameroun.
 
 > **Outil de démonstration, ne remplace pas un avis juridique.** Seul le texte publié au Journal
-> Officiel fait foi.
+> Officiel fait foi. Le texte interrogé est une transcription non officielle de la
+> [copie publiée par la Présidence de la République](https://prc.cm/fr/multimedia/documents/10257-loi-n-2024-016-du-23-12-2024-web).
 
 **Projet indépendant** : il n'a aucun lien avec un organisme public ni avec un employeur. Il est
 construit à partir du seul texte public de la loi, sans aucune donnée, code ni document interne.

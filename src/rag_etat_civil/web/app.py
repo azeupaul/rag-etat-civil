@@ -6,7 +6,7 @@ from flask import Flask, Response, jsonify, render_template, request
 from flask_htmx import HTMX
 
 from rag_etat_civil import __version__
-from rag_etat_civil.config import Settings
+from rag_etat_civil.config import OFFICIAL_SOURCE_URL, Settings
 
 # By default htmx does not swap the content of 4xx responses: we explicitly allow 422
 # (invalid question) so the error message is displayed in the page.
@@ -34,6 +34,7 @@ def create_app(settings: Settings | None = None) -> Flask:
         app_version=__version__,
         htmx_config=HTMX_CONFIG,
         max_question_length=settings.max_question_length,
+        official_source_url=OFFICIAL_SOURCE_URL,
     )
     htmx = HTMX(app)
 

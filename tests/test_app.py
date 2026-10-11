@@ -55,3 +55,9 @@ def test_ask_returns_full_page_without_htmx(client):
 def test_ask_returns_partial_with_htmx(client):
     response = client.post("/ask", data={"question": "Bonjour"}, headers={"HX-Request": "true"})
     assert "<html" not in response.get_data(as_text=True)
+
+
+def test_footer_links_to_official_source(client):
+    html = client.get("/").get_data(as_text=True)
+    assert 'href="https://prc.cm/' in html
+    assert 'rel="noopener noreferrer"' in html
