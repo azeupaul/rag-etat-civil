@@ -18,3 +18,7 @@ test:
 	uv run pytest
 
 check: lint test
+
+.PHONY: ingest
+ingest:
+	uv run python -m rag_etat_civil.ingestion.build

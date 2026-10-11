@@ -21,14 +21,16 @@ cp .env.example .env
 make install
 make run        # http://127.0.0.1:5000
 make check      # ruff + tests
+make ingest     # rebuild data/processed from data/raw
 ```
 
 ## Structure
 
 ```
 data/raw/           texte de la loi (transcription) et fiche de source
+data/processed/     articles et passages générés (`make ingest`)
 docs/               vérification de la transcription
-src/rag_etat_civil/ application (config, web)
+src/rag_etat_civil/ application (config, ingestion, web)
 tests/              tests
 ```
 

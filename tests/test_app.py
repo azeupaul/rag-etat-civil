@@ -47,11 +47,11 @@ def test_ask_too_long(client):
     assert "trop longue" in response.get_data(as_text=True)
 
 
-def test_ask_full_page_without_htmx(client):
+def test_ask_returns_full_page_without_htmx(client):
     html = client.post("/ask", data={"question": "Bonjour"}).get_data(as_text=True)
     assert "<html" in html
 
 
-def test_ask_partial_with_htmx(client):
+def test_ask_returns_partial_with_htmx(client):
     response = client.post("/ask", data={"question": "Bonjour"}, headers={"HX-Request": "true"})
     assert "<html" not in response.get_data(as_text=True)

@@ -1,4 +1,4 @@
-"""Application Flask : page d'accueil, route /ask (HTMX) et /health."""
+"""Flask application: home page, /ask route (HTMX) and /health."""
 
 from __future__ import annotations
 
@@ -8,9 +8,9 @@ from flask_htmx import HTMX
 from rag_etat_civil import __version__
 from rag_etat_civil.config import Settings
 
-# htmx ne remplace pas le contenu des réponses 4xx par défaut : on autorise explicitement
-# le 422 (question invalide) pour afficher le message d'erreur dans la page.
-# Les styles et eval inline sont désactivés pour tenir sous une CSP stricte.
+# By default htmx does not swap the content of 4xx responses: we explicitly allow 422
+# (invalid question) so the error message is displayed in the page.
+# Inline styles and eval are disabled so that the app works under a strict CSP.
 HTMX_CONFIG = (
     '{"includeIndicatorStyles":false,"allowEval":false,"responseHandling":['
     '{"code":"204","swap":false},'
@@ -25,7 +25,7 @@ CONTENT_SECURITY_POLICY = (
 
 
 def create_app(settings: Settings | None = None) -> Flask:
-    """Construit l'application (fabrique, pour pouvoir la configurer dans les tests)."""
+    """Build the application (factory, so that tests can configure it)."""
     settings = settings or Settings.from_env()
 
     app = Flask(__name__)
@@ -56,11 +56,11 @@ def create_app(settings: Settings | None = None) -> Flask:
             template, status = ("partials/error.html", 422)
             context = {"error": error}
         else:
-            # E1 : moteur RAG non branché (récupération en E3, génération en E4).
+            # E1: the RAG engine is not wired yet (retrieval in E3, generation in E4).
             template, status = ("partials/answer.html", 200)
             context = {"question": question}
 
-        # Sans JavaScript, le formulaire est envoyé normalement : on renvoie alors la page entière.
+        # Without JavaScript the form is submitted normally: return the whole page.
         if htmx:
             return render_template(template, **context), status
         return render_template("index.html", partial=template, **context), status

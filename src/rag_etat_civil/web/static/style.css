@@ -1,4 +1,4 @@
-/* Feuille de style écrite à la main : pas de framework, pas de build. */
+/* Hand-written stylesheet: no framework, no build step. */
 
 :root {
   --bg: #faf9f6;
@@ -72,7 +72,7 @@ main {
   padding-block: 1.5rem 3rem;
 }
 
-/* Accessibilité : lien d'évitement, focus visible */
+/* Accessibility: skip link, visible focus */
 .skip-link {
   position: absolute;
   left: 0.5rem;
@@ -94,7 +94,7 @@ main {
   outline-offset: 2px;
 }
 
-/* En-tête et pied de page */
+/* Header and footer */
 .site-header {
   padding-block: 2rem 1.25rem;
   border-bottom: 1px solid var(--border);
@@ -132,7 +132,7 @@ h1 {
   margin: 0;
 }
 
-/* Avertissement */
+/* Disclaimer */
 .notice {
   margin: 0 0 1.5rem;
   padding: 0.75rem 1rem;
@@ -141,7 +141,7 @@ h1 {
   border-radius: var(--radius);
 }
 
-/* Formulaire */
+/* Form */
 .ask-form label {
   display: block;
   margin-bottom: 0.375rem;
@@ -191,7 +191,7 @@ button:disabled {
   cursor: progress;
 }
 
-/* Indicateur de chargement htmx (les styles par défaut de htmx sont désactivés) */
+/* htmx loading indicator (htmx default styles are disabled) */
 .htmx-indicator {
   color: var(--muted);
   opacity: 0;
@@ -202,8 +202,8 @@ button:disabled {
   opacity: 1;
 }
 
-/* Résultats */
-#resultat {
+/* Results */
+#result {
   margin-top: 1.5rem;
 }
 
