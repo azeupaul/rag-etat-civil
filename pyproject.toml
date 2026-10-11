@@ -1,7 +1,9 @@
 [project]
 name = "rag-etat-civil"
 version = "0.1.0"
-description = "Add your description here"
+description = "Question answering with citations over Law No. 2024/016 of 23 December 2024 (civil status, Cameroon). RAG demo."
+license = "MIT"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
