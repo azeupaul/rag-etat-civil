@@ -4,8 +4,7 @@
 
 **Source primaire** : copie certifiée conforme (cachet du Secrétariat Général de la Présidence de la République, Service du Fichier législatif et réglementaire), PDF scanné de 40 pages, filigrane « www.prc.cm ».
 
-- URL de téléchargement : _à compléter_
-- Date de téléchargement : _à compléter_
+- URL de téléchargement : [_loi-n-2024-016-du-23-12-2024-web_](https://prc.cm/fr/multimedia/documents/10257-loi-n-2024-016-du-23-12-2024-web)
 - SHA-256 du PDF : `7edef45e1ed4cc224f5e795ef16136cb20788570d6bcc1e34174f23abe83dbd1`
 
 ## Transcription
@@ -14,7 +13,7 @@ Le PDF ne contient pas de texte exploitable (images scannées). Le fichier `loi_
 
 1. **Contrôle automatique** : 40 pages, articles 1 à 130 présents, dans l'ordre et sans doublon, chapitres I à X, alinéas numérotés consécutivement.
 2. **Comparaison indépendante** avec une seconde saisie manuelle, article par article, et vérification sur le scan de chaque désaccord.
-3. **Échantillon de 15 articles** relu mot à mot sur le scan (voir `verification_echantillon.md`).
+3. **Échantillon de 15 articles** relu mot à mot sur le scan (voir `docs/verification_echantillon.md`).
 
 ## Conventions
 
