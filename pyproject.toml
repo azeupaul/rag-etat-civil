@@ -12,6 +12,7 @@ dependencies = [
     "flask-htmx>=0.4.0",
     "numpy>=2.5.4",
     "py-rust-stemmers>=0.1.8",
+    "pydantic>=2.14.1",
     "python-dotenv>=1.2.4",
 ]
 
