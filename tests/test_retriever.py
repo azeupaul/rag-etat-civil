@@ -109,3 +109,17 @@ def test_index_with_unknown_chunk_ids_is_detected(chunks):
     retriever = HybridRetriever(chunks, embedder, build_index(renamed, embedder))
     with pytest.raises(IndexMismatchError, match="unknown chunk"):
         retriever.retrieve("naissance")
+
+
+def test_vector_hits_carry_their_cosine_similarity(retriever):
+    hits = retriever.retrieve("jugement supplétif")
+    found = [h for h in hits if "vector" in h.sources]
+    assert found
+    assert all(h.similarity is not None and -1.0 <= h.similarity <= 1.0 for h in found)
+
+
+def test_similarity_is_present_exactly_when_the_vector_search_found_the_chunk(retriever):
+    hits = retriever.retrieve("article 36 jugement supplétif")
+    assert hits
+    for hit in hits:
+        assert (hit.similarity is not None) == ("vector" in hit.sources)

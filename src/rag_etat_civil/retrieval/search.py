@@ -24,9 +24,10 @@ SNIPPET_CHARS = 300
 def format_hit(rank: int, hit: RetrievalHit, article: Article) -> str:
     chunk = hit.chunk
     part = f" (part {chunk.part}/{chunk.total})" if chunk.total > 1 else ""
+    similarity = "-" if hit.similarity is None else f"{hit.similarity:.3f}"
     header = (
         f"{rank}. Article {chunk.article}{part}  [{' + '.join(hit.sources)}]  "
-        f"score {hit.score:.4f}  PDF p. {article.page_start}"
+        f"rrf {hit.score:.4f}  similarity {similarity}  PDF p. {article.page_start}"
     )
     where = " > ".join(article.breadcrumb)
     text = " ".join(chunk.text.split())

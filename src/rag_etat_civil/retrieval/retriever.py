@@ -29,6 +29,10 @@ class RetrievalHit:
     chunk: Chunk
     score: float  # RRF score: only meaningful to compare hits of the same search
     sources: tuple[str, ...]  # which of "lookup", "vector", "bm25" found this chunk
+    # Cosine similarity between the question and the chunk (1.0 = same meaning). Unlike `score`,
+    # it does not depend on the other hits, so it can tell a good match from a poor one.
+    # None when the vector search did not return this chunk among its candidates.
+    similarity: float | None = None
 
 
 class HybridRetriever:
@@ -68,9 +72,11 @@ class HybridRetriever:
             return []
         top_k = self._top_k if top_k is None else top_k
 
+        vector_matches = self._vector_search(question)
+        similarities = {m.id: m.score for m in vector_matches}
         rankings = {
             "lookup": self._lookup(question),
-            "vector": self._vector_search(question),
+            "vector": [m.id for m in vector_matches],
             "bm25": [m.id for m in self._bm25.search(question, self._candidates)],
         }
         fused = reciprocal_rank_fusion(rankings, k=self._rrf_k)
@@ -79,7 +85,10 @@ class HybridRetriever:
         others = [f for f in fused if "lookup" not in f.sources]
         # Named articles are never cut, even if they take more than top_k places.
         selected = named + others[: max(0, top_k - len(named))]
-        return [RetrievalHit(self._chunk(f.id), f.score, f.sources) for f in selected]
+        return [
+            RetrievalHit(self._chunk(f.id), f.score, f.sources, similarities.get(f.id))
+            for f in selected
+        ]
 
     def _lookup(self, question: str) -> list[str]:
         numbers = find_article_numbers(question, self._max_article)[:MAX_LOOKUP_ARTICLES]
@@ -87,7 +96,7 @@ class HybridRetriever:
 
     def _vector_search(self, question: str) -> list[str]:
         query = self._embedder.embed_query(question)
-        return [m.id for m in self._index.search(query, self._candidates)]
+        return self._index.search(query, self._candidates)
 
     def _chunk(self, chunk_id: str) -> Chunk:
         try:
