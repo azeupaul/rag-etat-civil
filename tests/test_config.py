@@ -15,6 +15,7 @@ ENV_VARIABLES = {
     "EMBEDDING_CACHE_DIR": "/somewhere/cache",
     "RETRIEVAL_CANDIDATES": "30",
     "RETRIEVAL_TOP_K": "8",
+    "MIN_SIMILARITY": "0.83",
     "LLM_PROVIDER": "other-llm",
 }
 
@@ -36,6 +37,7 @@ def test_every_setting_can_be_overridden_by_its_environment_variable(
         embedding_cache_dir=Path("/somewhere/cache"),
         retrieval_candidates=30,
         retrieval_top_k=8,
+        min_similarity=0.83,
         llm_provider="other-llm",
     )
 

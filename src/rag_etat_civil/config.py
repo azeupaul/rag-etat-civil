@@ -38,6 +38,10 @@ class Settings:
     embedding_cache_dir: Path = field(default_factory=_default_model_cache_dir)
     retrieval_candidates: int = 20  # passages taken from each search before merging
     retrieval_top_k: int = 5  # passages given to the answer step
+
+    # Below this cosine similarity, a question that names no article is refused without calling
+    # the language model. 0 disables the check until the evaluation has chosen a value.
+    min_similarity: float = 0.0
     llm_provider: str = "gemini"  # the provider used for the answer step
 
     @property
@@ -65,5 +69,6 @@ class Settings:
                 os.environ.get("RETRIEVAL_CANDIDATES", defaults.retrieval_candidates)
             ),
             retrieval_top_k=int(os.environ.get("RETRIEVAL_TOP_K", defaults.retrieval_top_k)),
+            min_similarity=float(os.environ.get("MIN_SIMILARITY", defaults.min_similarity)),
             llm_provider=os.environ.get("LLM_PROVIDER", defaults.llm_provider),
         )
