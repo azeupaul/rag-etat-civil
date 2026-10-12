@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from rag_etat_civil.evaluation.retrieval import (
+    FRAGILE_MARGIN,
     QuestionRetrieval,
     SimilarityAnalysis,
     analyse_similarity,
@@ -112,13 +113,16 @@ def render_retrieval_report(
 
     lines += ["", "## Similarité et seuil de refus", ""]
     lines += [
-        "Meilleur cosinus entre la question et les passages trouvés. Les questions qui "
-        "nomment un article sont exclues du calcul : le seuil ne s'y applique jamais.",
+        "Meilleur cosinus entre la question et les passages trouvés. Le seuil est un filtre "
+        "contre les questions hors sujet (catégories `off_topic` et `adversarial`). Les "
+        "questions qui nomment un article sont exclues du calcul : le seuil ne s'y applique "
+        "jamais.",
         "",
     ]
     sim_rows = [
         [
             r.question.id,
+            r.question.category,
             _short(r.question.question),
             r.question.expected_status
             + (" (toléré : refus)" if r.question.tolerated_status == "refused" else ""),
@@ -128,27 +132,40 @@ def render_retrieval_report(
         for r in sorted(results, key=lambda r: r.best_similarity or 0.0, reverse=True)
         if r.best_similarity is not None
     ]
-    lines += _table(["id", "question", "statut attendu", "cosinus", ""], sim_rows)
+    lines += _table(["id", "catégorie", "question", "statut attendu", "cosinus", ""], sim_rows)
     lines += ["", *_threshold_conclusion(analysis)]
     return "\n".join(lines) + "\n"
 
 
 def _threshold_conclusion(analysis: SimilarityAnalysis) -> list[str]:
-    low, high = analysis.lowest_answerable, analysis.highest_refused
-    if analysis.threshold is not None and low and high:
+    low, high = analysis.lowest_answerable, analysis.highest_off_topic
+    if low is None or high is None:
+        return ["Pas assez de questions pour proposer un seuil."]
+    if analysis.threshold is None:
         return [
-            f"Les deux groupes sont séparés : la question à répondre la plus basse est {low.id} "
-            f"({low.similarity:.3f}) et la question à refuser la plus haute est {high.id} "
-            f"({high.similarity:.3f}). Seuil possible : **MIN_SIMILARITY={analysis.threshold}**."
+            f"Une question hors sujet ({high.id}, {high.similarity:.3f}) obtient un cosinus "
+            f"au moins aussi haut que la question à répondre la plus basse ({low.id}, "
+            f"{low.similarity:.3f}) : aucun seuil ne les sépare. Garder `MIN_SIMILARITY=0` "
+            "et laisser le modèle refuser."
         ]
     lines = [
-        "Les deux groupes se chevauchent (ou l'un est vide) : aucun seuil ne les sépare "
-        "proprement. Garder `MIN_SIMILARITY=0` et laisser le modèle refuser."
+        f"Question à répondre la plus basse : {low.id} ({low.similarity:.3f}). "
+        f"Question hors sujet la plus haute : {high.id} ({high.similarity:.3f}). "
+        f"Marge : {analysis.margin:.3f}.",
+        "",
+        f"Seuil possible : **MIN_SIMILARITY={analysis.threshold}**.",
     ]
-    if low and high:
+    if analysis.is_fragile:
         lines += [
             "",
-            f"Question à répondre la plus basse : {low.id} ({low.similarity:.3f}). "
-            f"Question à refuser la plus haute : {high.id} ({high.similarity:.3f}).",
+            f"**Marge inférieure à {FRAGILE_MARGIN} : seuil fragile**, "
+            "une question légitime reformulée pourrait être refusée à tort.",
+        ]
+    if analysis.left_to_model:
+        listed = ", ".join(f"{q.id} ({q.similarity:.3f})" for q in analysis.left_to_model)
+        lines += [
+            "",
+            f"Questions proches du sujet que la loi ne traite pas : {listed}. Aucun seuil ne "
+            "peut les distinguer d'une question légitime : elles sont laissées au modèle.",
         ]
     return lines

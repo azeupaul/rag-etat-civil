@@ -123,14 +123,16 @@ def test_best_similarity_is_the_highest_among_the_passages():
     assert result.named is False
 
 
+def scored(id: str, similarity: float, category: str = "direct", refused: bool = False):
+    changes = {"expected_status": "refused", "expected_articles": []} if refused else {}
+    q = question(id=id, category=category, **changes)
+    return evaluate_retrieval([q], StubRetriever([10], similarity), ks=[5])[0]
+
+
 def similarity_results(answerable: float, refused: float) -> list[QuestionRetrieval]:
     return [
-        evaluate_retrieval([question(id="in")], StubRetriever([10], answerable), ks=[5])[0],
-        evaluate_retrieval(
-            [question(id="out", expected_status="refused", expected_articles=[])],
-            StubRetriever([10], refused),
-            ks=[5],
-        )[0],
+        scored("in", answerable),
+        scored("out", refused, category="off_topic", refused=True),
     ]
 
 
@@ -138,14 +140,60 @@ def test_a_threshold_is_proposed_when_the_groups_are_separated():
     analysis = analyse_similarity(similarity_results(answerable=0.88, refused=0.80))
 
     assert analysis.lowest_answerable.id == "in"
-    assert analysis.highest_refused.id == "out"
+    assert analysis.highest_off_topic.id == "out"
     assert analysis.threshold == 0.84
+    assert analysis.margin == pytest.approx(0.08)
+    assert not analysis.is_fragile
 
 
 def test_no_threshold_when_the_groups_overlap():
     analysis = analyse_similarity(similarity_results(answerable=0.80, refused=0.85))
 
     assert analysis.threshold is None
+
+
+def test_a_small_margin_is_reported_as_fragile():
+    analysis = analyse_similarity(similarity_results(answerable=0.85, refused=0.84))
+
+    assert analysis.threshold == 0.845
+    assert analysis.is_fragile
+
+
+def test_questions_close_to_the_subject_are_left_to_the_model():
+    """Like "minimum marriage age": on topic, but the law does not answer."""
+    results = [
+        scored("in", 0.852),
+        scored("off", 0.793, category="off_topic", refused=True),
+        scored("close", 0.840, category="out_of_law", refused=True),
+    ]
+
+    analysis = analyse_similarity(results)
+
+    assert analysis.threshold == pytest.approx(0.8225, abs=0.001)
+    assert [q.id for q in analysis.left_to_model] == ["close"]
+
+
+def test_the_report_tells_which_questions_are_left_to_the_model():
+    results = [
+        scored("in", 0.852),
+        scored("off", 0.793, category="off_topic", refused=True),
+        scored("close", 0.840, category="out_of_law", refused=True),
+    ]
+
+    report = render_retrieval_report(results, embedding_model="fake", candidates=20)
+
+    assert "Marge : 0.059" in report
+    assert "close (0.840)" in report
+    assert "laissées au modèle" in report
+    assert "seuil fragile" not in report
+
+
+def test_the_report_warns_when_the_threshold_is_fragile():
+    results = similarity_results(answerable=0.85, refused=0.84)
+
+    report = render_retrieval_report(results, embedding_model="fake", candidates=20)
+
+    assert "seuil fragile" in report
 
 
 def test_questions_naming_an_article_are_left_out_of_the_threshold():
@@ -185,7 +233,7 @@ def test_the_report_covers_the_whole_dataset():
         assert f"| {q.id} |" in report
     assert "k=5" in report
     assert "k=10" in report
-    assert "MIN_SIMILARITY" in report or "se chevauchent" in report
+    assert "MIN_SIMILARITY" in report or "aucun seuil" in report
 
 
 def test_the_report_names_the_recommended_top_k():

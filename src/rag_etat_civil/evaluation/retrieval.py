@@ -99,6 +99,13 @@ def recommend_top_k(results: Sequence[QuestionRetrieval], category: str = "casca
     return None
 
 
+# The threshold is a cheap filter for questions that have nothing to do with the law. Questions
+# close to civil status that the law does not answer ("out_of_law") cannot be told apart from
+# legitimate ones by a number: they are left to the language model.
+THRESHOLD_REFUSED_CATEGORIES = ("off_topic", "adversarial")
+FRAGILE_MARGIN = 0.03
+
+
 @dataclass(frozen=True, slots=True)
 class ScoredQuestion:
     id: str
@@ -107,25 +114,49 @@ class ScoredQuestion:
 
 @dataclass(frozen=True, slots=True)
 class SimilarityAnalysis:
-    """Can a similarity threshold tell the questions the law answers from those it does not?"""
+    """Can a similarity threshold tell the questions the law answers from off-topic ones?"""
 
     lowest_answerable: ScoredQuestion | None  # the answerable question that scores lowest
-    highest_refused: ScoredQuestion | None  # the question to refuse that scores highest
+    highest_off_topic: ScoredQuestion | None  # the off-topic question that scores highest
     threshold: float | None  # None when the two groups overlap (or one is empty)
+    left_to_model: tuple[ScoredQuestion, ...]  # refused questions a threshold cannot judge
+
+    @property
+    def margin(self) -> float | None:
+        """The gap between the two groups: how wrong a new question can be before it fails."""
+        if self.lowest_answerable is None or self.highest_off_topic is None:
+            return None
+        return self.lowest_answerable.similarity - self.highest_off_topic.similarity
+
+    @property
+    def is_fragile(self) -> bool:
+        return self.margin is not None and self.margin < FRAGILE_MARGIN
 
 
-def analyse_similarity(results: Sequence[QuestionRetrieval]) -> SimilarityAnalysis:
+def analyse_similarity(
+    results: Sequence[QuestionRetrieval],
+    off_topic_categories: Sequence[str] = THRESHOLD_REFUSED_CATEGORIES,
+) -> SimilarityAnalysis:
     """Questions naming an article are left out: the threshold never applies to them."""
     scored = [
-        (r.question.expected_status, ScoredQuestion(r.question.id, r.best_similarity))
+        (r.question, ScoredQuestion(r.question.id, r.best_similarity))
         for r in results
         if not r.named and r.best_similarity is not None
     ]
-    answerable = [q for status, q in scored if status == "answered"]
-    refused = [q for status, q in scored if status == "refused"]
+    answerable = [s for q, s in scored if q.expected_status == "answered"]
+    off_topic = [
+        s
+        for q, s in scored
+        if q.expected_status == "refused" and q.category in off_topic_categories
+    ]
+    left_to_model = tuple(
+        s
+        for q, s in scored
+        if q.expected_status == "refused" and q.category not in off_topic_categories
+    )
     low = min(answerable, key=lambda q: q.similarity, default=None)
-    high = max(refused, key=lambda q: q.similarity, default=None)
+    high = max(off_topic, key=lambda q: q.similarity, default=None)
     threshold = None
     if low and high and low.similarity > high.similarity:
         threshold = round((low.similarity + high.similarity) / 2, 3)
-    return SimilarityAnalysis(low, high, threshold)
+    return SimilarityAnalysis(low, high, threshold, left_to_model)
