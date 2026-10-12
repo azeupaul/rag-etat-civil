@@ -17,6 +17,9 @@ ENV_VARIABLES = {
     "RETRIEVAL_TOP_K": "8",
     "MIN_SIMILARITY": "0.83",
     "LLM_PROVIDER": "other-llm",
+    "LLM_TIMEOUT_SECONDS": "12.5",
+    "GEMINI_MODEL": "gemini-other",
+    "GEMINI_API_KEY": "secret-key",
 }
 
 
@@ -39,6 +42,9 @@ def test_every_setting_can_be_overridden_by_its_environment_variable(
         retrieval_top_k=8,
         min_similarity=0.83,
         llm_provider="other-llm",
+        llm_timeout_seconds=12.5,
+        gemini_model="gemini-other",
+        gemini_api_key="secret-key",
     )
 
 
@@ -48,3 +54,7 @@ def test_defaults_apply_when_no_variable_is_set(monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setattr("rag_etat_civil.config.load_dotenv", lambda: None)  # ignore a local .env
 
     assert Settings.from_env() == Settings()
+
+
+def test_the_api_key_never_appears_in_the_representation_of_the_settings():
+    assert "secret-key" not in repr(Settings(gemini_api_key="secret-key"))

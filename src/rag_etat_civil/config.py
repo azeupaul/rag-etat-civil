@@ -43,6 +43,9 @@ class Settings:
     # the language model. 0 disables the check until the evaluation has chosen a value.
     min_similarity: float = 0.0
     llm_provider: str = "gemini"  # the provider used for the answer step
+    llm_timeout_seconds: float = 30.0  # timeout for the LLM request
+    gemini_model: str = "gemini-3.5-flash-lite"  # the model used for the answer step
+    gemini_api_key: str = field(default="", repr=False)  # a secret: never shown in logs
 
     @property
     def index_dir(self) -> Path:
@@ -71,4 +74,9 @@ class Settings:
             retrieval_top_k=int(os.environ.get("RETRIEVAL_TOP_K", defaults.retrieval_top_k)),
             min_similarity=float(os.environ.get("MIN_SIMILARITY", defaults.min_similarity)),
             llm_provider=os.environ.get("LLM_PROVIDER", defaults.llm_provider),
+            llm_timeout_seconds=float(
+                os.environ.get("LLM_TIMEOUT_SECONDS", defaults.llm_timeout_seconds)
+            ),
+            gemini_model=os.environ.get("GEMINI_MODEL", defaults.gemini_model),
+            gemini_api_key=os.environ.get("GEMINI_API_KEY", defaults.gemini_api_key),
         )

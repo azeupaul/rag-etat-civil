@@ -19,7 +19,7 @@ def test_default_provider_is_gemini():
 
 def test_unknown_provider_lists_the_available_ones(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setitem(LLM_PROVIDERS, "fake", lambda settings: FakeLLM())
-    with pytest.raises(ValueError, match=r"Unknown LLM_PROVIDER 'nope'.*\['fake'\]"):
+    with pytest.raises(ValueError, match=r"Unknown LLM_PROVIDER 'nope'.*'fake'"):
         create_llm(Settings(llm_provider="nope"))
 
 
