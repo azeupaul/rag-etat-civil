@@ -6,6 +6,7 @@ import pytest
 
 pytest.importorskip("google.genai", reason="needs `uv sync --extra gemini`")
 
+from dotenv import load_dotenv
 from google.genai import errors
 
 from rag_etat_civil.config import Settings
@@ -13,6 +14,9 @@ from rag_etat_civil.llm.base import LLMError
 from rag_etat_civil.llm.gemini import GeminiProvider
 from rag_etat_civil.llm.registry import create_llm
 
+# The skip condition of the real test is evaluated when this file is imported, before any
+# application code has read the .env file: load it here, otherwise the key is never seen.
+load_dotenv()
 SCHEMA = {"type": "object", "properties": {"ok": {"type": "boolean"}}}
 
 
@@ -92,9 +96,6 @@ def test_the_registry_explains_a_missing_api_key():
 def test_real_gemini_returns_json_matching_the_schema():
     import json
 
-    from dotenv import load_dotenv
-
-    load_dotenv()
     llm = create_llm(Settings.from_env())
 
     text = llm.generate_json(
