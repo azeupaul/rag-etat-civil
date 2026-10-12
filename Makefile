@@ -25,7 +25,7 @@ test-llm:
 
 check: lint test
 
-.PHONY: ingest index search
+.PHONY: ingest index search ask eval-retrieval
 ingest:
 	uv run python -m rag_etat_civil.ingestion.build
 
@@ -39,3 +39,6 @@ search:
 ask:
 	@test -n "$(q)" || { echo 'usage: make ask q="your question"'; exit 1; }
 	@uv run python -m rag_etat_civil.answering.ask "$(q)"
+
+eval-retrieval:
+	uv run python eval/run_eval.py retrieval
