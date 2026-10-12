@@ -38,6 +38,7 @@ class Settings:
     embedding_cache_dir: Path = field(default_factory=_default_model_cache_dir)
     retrieval_candidates: int = 20  # passages taken from each search before merging
     retrieval_top_k: int = 5  # passages given to the answer step
+    llm_provider: str = "gemini"  # the provider used for the answer step
 
     @property
     def index_dir(self) -> Path:
@@ -60,4 +61,5 @@ class Settings:
             embedding_cache_dir=Path(
                 os.environ.get("EMBEDDING_CACHE_DIR", defaults.embedding_cache_dir)
             ),
+            llm_provider=os.environ.get("LLM_PROVIDER", defaults.llm_provider),
         )

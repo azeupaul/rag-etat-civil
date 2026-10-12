@@ -5,10 +5,12 @@ from __future__ import annotations
 import re
 import zlib
 from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 
 from rag_etat_civil.embeddings.base import Embedder, Vectors
+from rag_etat_civil.llm.base import LLMProvider
 
 
 class HashingEmbedder(Embedder):
@@ -40,3 +42,21 @@ class HashingEmbedder(Embedder):
 
     def embed_query(self, text: str) -> Vectors:
         return self._vector(text)
+
+
+class FakeLLM(LLMProvider):
+    """A language model that returns prepared answers, one per call, and records the calls."""
+
+    def __init__(self, *answers: str) -> None:
+        self._answers = list(answers)
+        self.calls: list[tuple[str, str, dict[str, Any]]] = []
+
+    @property
+    def model_id(self) -> str:
+        return "fake:scripted"
+
+    def generate_json(self, system_prompt: str, user_prompt: str, schema: dict[str, Any]) -> str:
+        self.calls.append((system_prompt, user_prompt, schema))
+        if not self._answers:
+            raise AssertionError("FakeLLM was called more times than it has prepared answers")
+        return self._answers.pop(0)
