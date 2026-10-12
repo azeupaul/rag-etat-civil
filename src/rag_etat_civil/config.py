@@ -39,6 +39,11 @@ class Settings:
     retrieval_candidates: int = 20  # passages taken from each search before merging
     retrieval_top_k: int = 5  # passages given to the answer step
 
+    @property
+    def index_dir(self) -> Path:
+        """Where the vector index is written (generated, not committed)."""
+        return self.data_dir / "index"
+
     @classmethod
     def from_env(cls) -> Settings:
         """Build the settings from the environment (and from a .env file if present)."""

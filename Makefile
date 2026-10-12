@@ -22,6 +22,13 @@ test-model:
 
 check: lint test
 
-.PHONY: ingest
+.PHONY: ingest index search
 ingest:
 	uv run python -m rag_etat_civil.ingestion.build
+
+index:
+	uv run python -m rag_etat_civil.retrieval.build_index
+
+search:
+	@test -n "$(q)" || { echo 'usage: make search q="your question"'; exit 1; }
+	@uv run python -m rag_etat_civil.retrieval.search "$(q)"
