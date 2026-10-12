@@ -37,7 +37,9 @@ class Settings:
     embedding_model: str = "intfloat/multilingual-e5-large"
     embedding_cache_dir: Path = field(default_factory=_default_model_cache_dir)
     retrieval_candidates: int = 20  # passages taken from each search before merging
-    retrieval_top_k: int = 5  # passages given to the answer step
+    # Passages given to the answer step: the smallest value that keeps every article of the
+    # deadline cascades (see `make eval-retrieval`).
+    retrieval_top_k: int = 8
 
     # Below this cosine similarity, a question that names no article is refused without calling
     # the language model. 0 disables the check until the evaluation has chosen a value.

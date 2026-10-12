@@ -50,6 +50,11 @@ Le score `rrf` ne sert qu'à ordonner les résultats d'une même question. La si
 permet de distinguer une question qui porte sur la loi d'une question hors sujet ; son seuil sera
 fixé avec l'évaluation, pas avant.
 
+Le nombre de passages donnés au modèle (`RETRIEVAL_TOP_K`, 8 par défaut) vient de l'évaluation :
+avec 5 passages, une question en cascade comme « dans quel délai déclarer une naissance ? » perd
+l'article 13 (jugement déclaratif au-delà de 12 mois) ; avec 8, les articles 10, 12 et 13 sont tous
+présents (`make eval-retrieval`, rapport dans `eval/results/retrieval.md`).
+
 Les composants sont interchangeables : `Embedder` et `VectorIndex` sont des interfaces, le choix se
 fait par variable d'environnement (voir `.env.example`). Changer de modèle d'embeddings impose de
 refaire l'index ; une incohérence est détectée et signalée au chargement.

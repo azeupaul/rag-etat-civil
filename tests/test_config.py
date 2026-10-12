@@ -14,7 +14,7 @@ ENV_VARIABLES = {
     "EMBEDDING_MODEL": "org/other-model",
     "EMBEDDING_CACHE_DIR": "/somewhere/cache",
     "RETRIEVAL_CANDIDATES": "30",
-    "RETRIEVAL_TOP_K": "8",
+    "RETRIEVAL_TOP_K": "7",
     "MIN_SIMILARITY": "0.83",
     "LLM_PROVIDER": "other-llm",
     "LLM_TIMEOUT_SECONDS": "12.5",
@@ -39,7 +39,7 @@ def test_every_setting_can_be_overridden_by_its_environment_variable(
         embedding_model="org/other-model",
         embedding_cache_dir=Path("/somewhere/cache"),
         retrieval_candidates=30,
-        retrieval_top_k=8,
+        retrieval_top_k=7,
         min_similarity=0.83,
         llm_provider="other-llm",
         llm_timeout_seconds=12.5,
@@ -58,3 +58,8 @@ def test_defaults_apply_when_no_variable_is_set(monkeypatch: pytest.MonkeyPatch)
 
 def test_the_api_key_never_appears_in_the_representation_of_the_settings():
     assert "secret-key" not in repr(Settings(gemini_api_key="secret-key"))
+
+
+def test_the_default_number_of_passages_is_the_one_chosen_by_the_evaluation():
+    """8 is the smallest value that gives every article of the deadline cascades."""
+    assert Settings().retrieval_top_k == 8
