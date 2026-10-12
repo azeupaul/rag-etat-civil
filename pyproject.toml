@@ -16,6 +16,11 @@ dependencies = [
     "python-dotenv>=1.2.4",
 ]
 
+[project.optional-dependencies]
+gemini = [
+    "google-genai>=2.29.0",
+]
+
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
@@ -53,7 +58,8 @@ select = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra -m 'not model'"
+addopts = "-ra -m 'not model and not llm'"
 markers = [
-    "model:  needs the real embedding model (about 2.2 GB, run with `make test-model`)",
+    "model: needs the real embedding model (about 2.2 GB, run with `make test-model`)",
+    "llm: calls the real language model with your API key (run with `make test-llm`)",
 ]

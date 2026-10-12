@@ -1,7 +1,7 @@
-.PHONY: install run lint format test check
+.PHONY: install run lint format test test-model test-llm check
 
 install:
-	uv sync
+	uv sync --all-extras
 
 run:
 	uv run flask --app rag_etat_civil.web.wsgi:app run --debug
@@ -20,6 +20,9 @@ test:
 test-model:
 	uv run pytest -m model
 
+test-llm:
+	uv run pytest -m llm
+
 check: lint test
 
 .PHONY: ingest index search
@@ -32,3 +35,7 @@ index:
 search:
 	@test -n "$(q)" || { echo 'usage: make search q="your question"'; exit 1; }
 	@uv run python -m rag_etat_civil.retrieval.search "$(q)"
+
+ask:
+	@test -n "$(q)" || { echo 'usage: make ask q="your question"'; exit 1; }
+	@uv run python -m rag_etat_civil.answering.ask "$(q)"
