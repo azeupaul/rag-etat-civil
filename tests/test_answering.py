@@ -211,3 +211,9 @@ def test_the_answer_can_be_serialized_for_the_api(retriever, articles):
 
     assert data["reason"] == "model_refused"
     assert data["citations"] == []
+
+
+def test_the_prompt_asks_for_complete_answers_on_deadlines_and_procedures():
+    assert "Sois complet" in SYSTEM_PROMPT
+    assert "délais supplémentaires" in SYSTEM_PROMPT
+    assert "quelques phrases" not in SYSTEM_PROMPT
