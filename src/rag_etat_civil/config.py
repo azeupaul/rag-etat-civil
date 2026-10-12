@@ -61,5 +61,9 @@ class Settings:
             embedding_cache_dir=Path(
                 os.environ.get("EMBEDDING_CACHE_DIR", defaults.embedding_cache_dir)
             ),
+            retrieval_candidates=int(
+                os.environ.get("RETRIEVAL_CANDIDATES", defaults.retrieval_candidates)
+            ),
+            retrieval_top_k=int(os.environ.get("RETRIEVAL_TOP_K", defaults.retrieval_top_k)),
             llm_provider=os.environ.get("LLM_PROVIDER", defaults.llm_provider),
         )
