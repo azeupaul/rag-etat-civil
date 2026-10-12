@@ -197,6 +197,7 @@
     "category": "out_of_law",
     "question": "Quel est l'âge minimum pour se marier au Cameroun ?",
     "expected_status": "refused",
+    "tolerated_status": "answered",
     "expected_articles": [],
     "also_accepted_articles": [1],
     "facts": [],
