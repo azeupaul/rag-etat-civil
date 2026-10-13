@@ -219,6 +219,17 @@ def test_the_prompt_asks_for_complete_answers_on_deadlines_and_procedures():
     assert "quelques phrases" not in SYSTEM_PROMPT
 
 
+def test_the_system_prompt_can_be_chosen_for_one_answerer(retriever, articles):
+    first = retriever.retrieve(QUESTION, top_k=2)[0].chunk.article
+    default, custom = FakeLLM(reply(citations=[first])), FakeLLM(reply(citations=[first]))
+
+    make_answerer(retriever, articles, default).answer(QUESTION)
+    make_answerer(retriever, articles, custom, system_prompt="Un autre prompt.").answer(QUESTION)
+
+    assert default.calls[0][0] == SYSTEM_PROMPT
+    assert custom.calls[0][0] == "Un autre prompt."
+
+
 def test_the_number_of_passages_can_be_chosen_for_one_answerer(retriever, articles):
     first = retriever.retrieve(QUESTION, top_k=2)[0].chunk.article
     few, many = FakeLLM(reply(citations=[first])), FakeLLM(reply(citations=[first]))

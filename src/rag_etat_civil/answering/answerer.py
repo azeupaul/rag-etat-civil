@@ -48,12 +48,14 @@ class Answerer:
         *,
         min_similarity: float = 0.0,
         top_k: int | None = None,
+        system_prompt: str = SYSTEM_PROMPT,
     ) -> None:
         self._retriever = retriever
         self._llm = llm
         self._articles = {article.number: article for article in articles}
         self._min_similarity = min_similarity
-        self._top_k = top_k
+        self._top_k = top_k  # None: the retriever's own setting
+        self._system_prompt = system_prompt  # the evaluation compares several
 
     def answer(self, question: str) -> Answer:
         question = question.strip()
@@ -70,7 +72,7 @@ class Answerer:
         problem: str | None = None
         for _ in range(MAX_ATTEMPTS):
             user_prompt = build_user_prompt(question, hits, self._articles, problem)
-            raw = self._llm.generate_json(SYSTEM_PROMPT, user_prompt, ANSWER_SCHEMA)
+            raw = self._llm.generate_json(self._system_prompt, user_prompt, ANSWER_SCHEMA)
             try:
                 reply = ModelAnswer.model_validate_json(raw)
             except ValidationError:

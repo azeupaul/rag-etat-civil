@@ -2,7 +2,7 @@
 
     make eval-retrieval
     make eval-answers
-    make eval-answers args="--top-k 8,15 --min-similarity 0,0.823"
+    make eval-answers args="--top-k 8,15 --min-similarity 0,0.823 --prompt current,baseline"
 
 `retrieval` checks the search alone (no language model): do the expected articles reach the
 model, for which top_k, and can a similarity threshold tell off-topic questions apart?
@@ -17,7 +17,6 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from rag_etat_civil.answering.answerer import Answerer
-from rag_etat_civil.answering.prompt import SYSTEM_PROMPT
 from rag_etat_civil.config import Settings
 from rag_etat_civil.evaluation.answers_report import render_answers_report
 from rag_etat_civil.evaluation.answers_run import (
@@ -28,6 +27,7 @@ from rag_etat_civil.evaluation.answers_run import (
     run_questions,
 )
 from rag_etat_civil.evaluation.dataset import load_questions
+from rag_etat_civil.evaluation.prompts import PROMPTS
 from rag_etat_civil.evaluation.retrieval import evaluate_retrieval
 from rag_etat_civil.evaluation.retrieval_report import render_retrieval_report
 from rag_etat_civil.ingestion.build import load_articles
@@ -66,6 +66,7 @@ def run_retrieval(ks: Sequence[int], output: Path) -> int:
 def run_answers(
     top_ks: Sequence[int],
     thresholds: Sequence[float],
+    prompt_names: Sequence[str],
     *,
     refresh: bool,
     pause: float,
@@ -84,28 +85,35 @@ def run_answers(
     cache = AnswerCache(cache_path)
 
     results = []
-    for top_k in top_ks:
-        for threshold in thresholds:
-            config = RunConfig(
-                llm.model_id, top_k, threshold, "current", prompt_hash(SYSTEM_PROMPT)
-            )
-            answerer = Answerer(retriever, llm, articles, min_similarity=threshold, top_k=top_k)
-            print(f"\n== {config.label}")
+    for prompt_name in prompt_names:
+        prompt = PROMPTS[prompt_name]
+        for top_k in top_ks:
+            for threshold in thresholds:
+                config = RunConfig(llm.model_id, top_k, threshold, prompt_name, prompt_hash(prompt))
+                answerer = Answerer(
+                    retriever,
+                    llm,
+                    articles,
+                    min_similarity=threshold,
+                    top_k=top_k,
+                    system_prompt=prompt,
+                )
+                print(f"\n== {config.label}")
 
-            def show(run: QuestionRun) -> None:
-                source = "cache" if run.cached else f"{run.seconds:.1f} s"
-                print(f"  {run.question.id:<4} {run.score.verdict.value:<9} ({source})")
+                def show(run: QuestionRun) -> None:
+                    source = "cache" if run.cached else f"{run.seconds:.1f} s"
+                    print(f"  {run.question.id:<4} {run.score.verdict.value:<9} ({source})")
 
-            runs = run_questions(
-                questions,
-                answerer,
-                config,
-                cache,
-                refresh=refresh,
-                pause=pause,
-                on_result=show,
-            )
-            results.append((config, runs))
+                runs = run_questions(
+                    questions,
+                    answerer,
+                    config,
+                    cache,
+                    refresh=refresh,
+                    pause=pause,
+                    on_result=show,
+                )
+                results.append((config, runs))
 
     report = render_answers_report(results)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -142,18 +150,32 @@ def main(argv: Sequence[str] | None = None) -> int:
         type=lambda text: [float(part) for part in text.split(",")],
         help="refusal thresholds to compare, separated by commas (default: MIN_SIMILARITY)",
     )
+    answers.add_argument(
+        "--prompt",
+        type=lambda text: text.split(","),
+        default=["current"],
+        help=f"prompts to compare, separated by commas, among {', '.join(PROMPTS)} "
+        "(default: current)",
+    )
     answers.add_argument("--refresh", action="store_true", help="ignore the cached answers")
     answers.add_argument("--pause", type=float, default=0.0, help="seconds between two calls")
     answers.add_argument("--cache", type=Path, default=CACHE_PATH)
     answers.add_argument("--output", type=Path, default=RESULTS_DIR / "answers.md")
 
     args = parser.parse_args(argv)
+    if args.command == "answers":
+        unknown = [name for name in args.prompt if name not in PROMPTS]
+        if unknown:
+            parser.error(
+                f"unknown prompt: {', '.join(unknown)} (choose among {', '.join(PROMPTS)})"
+            )
     if args.command == "retrieval":
         return run_retrieval(args.ks, args.output)
     defaults = Settings.from_env()
     return run_answers(
         args.top_k or [defaults.retrieval_top_k],
         args.min_similarity or [defaults.min_similarity],
+        args.prompt,
         refresh=args.refresh,
         pause=args.pause,
         cache_path=args.cache,
