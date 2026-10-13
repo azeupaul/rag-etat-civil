@@ -217,3 +217,14 @@ def test_the_prompt_asks_for_complete_answers_on_deadlines_and_procedures():
     assert "Sois complet" in SYSTEM_PROMPT
     assert "délais supplémentaires" in SYSTEM_PROMPT
     assert "quelques phrases" not in SYSTEM_PROMPT
+
+
+def test_the_number_of_passages_can_be_chosen_for_one_answerer(retriever, articles):
+    first = retriever.retrieve(QUESTION, top_k=2)[0].chunk.article
+    few, many = FakeLLM(reply(citations=[first])), FakeLLM(reply(citations=[first]))
+
+    make_answerer(retriever, articles, few, top_k=2).answer(QUESTION)
+    make_answerer(retriever, articles, many, top_k=12).answer(QUESTION)
+
+    assert few.calls[0][1].count("<passage ") == 2
+    assert many.calls[0][1].count("<passage ") == 12

@@ -25,7 +25,7 @@ test-llm:
 
 check: lint test
 
-.PHONY: ingest index search ask eval-retrieval
+.PHONY: ingest index search ask eval-retrieval eval-answers
 ingest:
 	uv run python -m rag_etat_civil.ingestion.build
 
@@ -42,3 +42,6 @@ ask:
 
 eval-retrieval:
 	uv run python eval/run_eval.py retrieval
+
+eval-answers:
+	uv run python eval/run_eval.py answers $(args)

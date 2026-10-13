@@ -47,18 +47,20 @@ class Answerer:
         articles: Sequence[Article],
         *,
         min_similarity: float = 0.0,
+        top_k: int | None = None,
     ) -> None:
         self._retriever = retriever
         self._llm = llm
         self._articles = {article.number: article for article in articles}
         self._min_similarity = min_similarity
+        self._top_k = top_k
 
     def answer(self, question: str) -> Answer:
         question = question.strip()
         if not question:
             return refusal(RefusalReason.NO_PASSAGE)
 
-        hits = self._retriever.retrieve(question)
+        hits = self._retriever.retrieve(question, top_k=self._top_k)
         if not hits:
             return refusal(RefusalReason.NO_PASSAGE)
         if self._is_out_of_scope(hits):
