@@ -44,6 +44,30 @@ NOT_READY_MESSAGE = "Le service n'est pas prêt : l'index de recherche est absen
 BAD_BODY_MESSAGE = 'Corps JSON attendu : {"question": "..."}.'
 
 
+# Why the assistant did not answer, in words a visitor can act on (one entry per RefusalReason).
+REFUSAL_HELP = {
+    "out_of_scope": "Votre question ne semble pas porter sur la loi n° 2024/016.",
+    "no_passage": "Aucun passage de la loi ne correspond à votre question. Reformulez-la.",
+    "model_refused": (
+        "Les passages retrouvés ne contiennent pas la réponse. La loi ne traite peut-être pas "
+        "ce point, ou renvoie à un règlement. Vous pouvez reformuler la question."
+    ),
+    "invalid_answer": (
+        "Une réponse a été produite mais ses citations n'ont pas pu être vérifiées, "
+        "elle n'est donc pas affichée. Réessayez ou reformulez la question."
+    ),
+}
+
+# Questions offered on the page. All of them are in eval/questions.json and were answered
+# correctly by the evaluation: a visitor's first click should show the assistant at its best.
+EXAMPLE_QUESTIONS = (
+    "Qui doit déclarer la naissance d'un enfant né dans un hôpital, et dans quel délai ?",
+    "Les services d'état civil sont-ils gratuits ? Et les copies d'actes ?",
+    "Qu'est-ce que le NIPU ?",
+    "Un acte d'état civil électronique a-t-il la même valeur qu'un acte sur papier ?",
+)
+
+
 def json_response(model: BaseModel, status: int = 200) -> Response:
     return Response(model.model_dump_json(), status=status, mimetype="application/json")
 
@@ -61,6 +85,8 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
         htmx_config=HTMX_CONFIG,
         max_question_length=settings.max_question_length,
         official_source_url=OFFICIAL_SOURCE_URL,
+        example_questions=EXAMPLE_QUESTIONS,
+        refusal_help=REFUSAL_HELP,
     )
     htmx = HTMX(app)
 

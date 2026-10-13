@@ -5,6 +5,7 @@
   <h2>Réponse</h2>
   {% if answer.status == "answered" %}
   <p class="answer-text">{{ answer.text }}</p>
+
   <h3>Articles cités</h3>
   <ul class="citations">
     {% for citation in answer.citations %}
@@ -14,7 +15,11 @@
     </li>
     {% endfor %}
   </ul>
+  <p class="muted caution">La réponse peut être incomplète : lisez les articles cités en entier.</p>
   {% else %}
   <p class="answer-text">{{ answer.text }}</p>
+  {% if answer.reason %}
+  <p class="muted">{{ refusal_help[answer.reason.value] }}</p>
+  {% endif %}
   {% endif %}
 </article>

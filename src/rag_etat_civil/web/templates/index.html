@@ -19,6 +19,22 @@
   </div>
 </form>
 
+<section class="examples" aria-labelledby="examples-title">
+  <h2 id="examples-title">Ou essayez un exemple</h2>
+  <ul>
+    {% for example in example_questions %}
+    <li>
+      <form method="post" action="{{ url_for('ask') }}"
+            hx-post="{{ url_for('ask') }}" hx-target="#result" hx-swap="innerHTML"
+            hx-indicator="#loading" hx-disabled-elt="find button">
+        <input type="hidden" name="question" value="{{ example }}">
+        <button type="submit" class="example">{{ example }}</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
 <section id="result" aria-live="polite" aria-label="Réponse">
   {% if partial %}{% include partial %}{% endif %}
 </section>

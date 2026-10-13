@@ -3,13 +3,15 @@ import shutil
 
 import pytest
 
+from rag_etat_civil.answering.models import RefusalReason
 from rag_etat_civil.config import Settings
 from rag_etat_civil.embeddings.registry import EMBEDDERS
+from rag_etat_civil.evaluation.dataset import load_questions
 from rag_etat_civil.ingestion.build import load_chunks
 from rag_etat_civil.llm.base import LLMError
 from rag_etat_civil.llm.registry import LLM_PROVIDERS
 from rag_etat_civil.retrieval.build_index import build_index
-from rag_etat_civil.web.app import HTMX_CONFIG, create_app
+from rag_etat_civil.web.app import EXAMPLE_QUESTIONS, HTMX_CONFIG, REFUSAL_HELP, create_app
 from tests.fakes import FakeLLM, HashingEmbedder
 
 REAL_DATA = Settings().data_dir
@@ -82,6 +84,24 @@ def test_htmx_shows_the_unavailable_message_of_a_503():
     assert '{"code":"503","swap":true,"error":false}' in HTMX_CONFIG
 
 
+def test_the_page_offers_example_questions_that_post_to_ask(client):
+    html = client.get("/").get_data(as_text=True)
+
+    assert html.count('class="example"') == len(EXAMPLE_QUESTIONS)
+    assert "Qu&#39;est-ce que le NIPU ?" in html
+
+
+def test_every_example_question_is_a_checked_question_of_the_evaluation():
+    evaluated = {q.question for q in load_questions() if q.expected_status == "answered"}
+
+    assert set(EXAMPLE_QUESTIONS) <= evaluated
+    assert all(len(q) <= Settings().max_question_length for q in EXAMPLE_QUESTIONS)
+
+
+def test_every_refusal_reason_has_a_help_message():
+    assert set(REFUSAL_HELP) == {reason.value for reason in RefusalReason}
+
+
 # --- /health -----------------------------------------------------------------------------------
 
 
@@ -113,6 +133,7 @@ def test_ask_shows_the_answer_and_links_the_cited_articles(make_client):
     assert response.status_code == 200
     assert "Selon l&#39;article 36" in html
     assert 'href="/articles/36"' in html
+    assert "peut être incomplète" in html
     assert "<html" not in html
 
 
@@ -121,8 +142,11 @@ def test_ask_shows_a_refusal_as_an_answer(make_client):
 
     response = client.post("/ask", data={"question": "capitale ?"}, headers=HTMX)
 
+    html = response.get_data(as_text=True)
     assert response.status_code == 200
-    assert "Je ne trouve pas la réponse dans le texte de la loi." in response.get_data(as_text=True)
+    assert "Je ne trouve pas la réponse dans le texte de la loi." in html
+    assert "ne contiennent pas la réponse" in html  # the help for a refusal of the model
+    assert "peut être incomplète" not in html
 
 
 def test_ask_escapes_html(make_client):
