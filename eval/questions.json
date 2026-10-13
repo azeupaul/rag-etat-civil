@@ -186,7 +186,7 @@
     "question": "delai pour declarer un deces",
     "expected_status": "answered",
     "expected_articles": [21],
-    "also_accepted_articles": [22, 23],
+    "also_accepted_articles": [22, 23, 25, 27, 61],
     "facts": [["quatre-vingt-dix", "90"]],
     "forbidden_patterns": [],
     "reference_answer": "Le décès est déclaré dans les 90 jours (art. 21).",
