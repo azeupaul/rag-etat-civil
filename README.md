@@ -47,8 +47,11 @@ pas comparables. `make search` affiche pour chaque passage l'article, qui l'a tr
 fusion (`rrf`), la similarité cosinus (`similarity`) et la page du PDF officiel.
 
 Le score `rrf` ne sert qu'à ordonner les résultats d'une même question. La similarité, elle,
-permet de distinguer une question qui porte sur la loi d'une question hors sujet ; son seuil sera
-fixé avec l'évaluation, pas avant.
+permet de distinguer une question qui porte sur la loi d'une question hors sujet. Le seuil
+(`MIN_SIMILARITY`, 0,80 par défaut) vient de l'évaluation : la question dans le périmètre la plus
+éloignée est à 0,852, la question hors sujet la plus proche à 0,793. 0,80 ne refuse donc aucune
+question légitime de l'évaluation ; il évite seulement d'appeler le modèle pour les questions
+manifestement hors sujet, que le modèle refuserait de toute façon.
 
 Le nombre de passages donnés au modèle (`RETRIEVAL_TOP_K`, 8 par défaut) vient de l'évaluation :
 avec 5 passages, une question en cascade comme « dans quel délai déclarer une naissance ? » perd

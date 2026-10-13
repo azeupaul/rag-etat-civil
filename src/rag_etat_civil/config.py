@@ -42,8 +42,10 @@ class Settings:
     retrieval_top_k: int = 8
 
     # Below this cosine similarity, a question that names no article is refused without calling
-    # the language model. 0 disables the check until the evaluation has chosen a value.
-    min_similarity: float = 0.0
+    # the language model. The evaluation puts the lowest in-scope question at 0.852 and the
+    # highest off-topic one at 0.793: 0.80 never refuses an in-scope question and only saves
+    # model calls (the model refuses off-topic questions on its own). 0 disables the check.
+    min_similarity: float = 0.80
     llm_provider: str = "gemini"  # the provider used for the answer step
     llm_timeout_seconds: float = 30.0  # timeout for the LLM request
     gemini_model: str = "gemini-3.5-flash-lite"  # the model used for the answer step

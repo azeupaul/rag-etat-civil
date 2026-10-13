@@ -63,3 +63,8 @@ def test_the_api_key_never_appears_in_the_representation_of_the_settings():
 def test_the_default_number_of_passages_is_the_one_chosen_by_the_evaluation():
     """8 is the smallest value that gives every article of the deadline cascades."""
     assert Settings().retrieval_top_k == 8
+
+
+def test_the_default_threshold_sits_between_off_topic_and_in_scope_questions():
+    """0.793 is the closest off-topic question, 0.852 the farthest in-scope one."""
+    assert 0.793 < Settings().min_similarity < 0.852

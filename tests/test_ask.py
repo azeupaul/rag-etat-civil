@@ -30,6 +30,8 @@ def configured(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     monkeypatch.setenv("EMBEDDER", "fake")
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("LLM_PROVIDER", "fake")
+    # The fake embedder's similarities mean nothing: no threshold, or every question is refused.
+    monkeypatch.setenv("MIN_SIMILARITY", "0")
     return monkeypatch
 
 
