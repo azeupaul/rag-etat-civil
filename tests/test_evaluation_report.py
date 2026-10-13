@@ -52,8 +52,8 @@ def test_the_report_compares_the_configurations_with_their_verdict_counts():
     text = report()
 
     assert "## Comparaison des configurations" in text
-    assert "| k=8, seuil=0, prompt=current | 0 | 1 | 0 | 1 | 0 |" in text
-    assert "| k=15, seuil=0, prompt=current | 1 | 0 | 0 | 0 | 1 |" in text
+    assert "| k=8, seuil=0, prompt=current | 0 | 1 | 0 | 0 | 1 | 0 |" in text
+    assert "| k=15, seuil=0, prompt=current | 1 | 0 | 0 | 0 | 0 | 1 |" in text
 
 
 def test_the_report_gives_a_verdict_per_question_and_configuration():

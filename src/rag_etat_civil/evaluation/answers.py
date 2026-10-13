@@ -20,8 +20,9 @@ class Verdict(StrEnum):
     OK = "ok"  # right status; every fact and every expected article is there
     PARTIAL = "partial"  # right status, but a fact or an expected article is missing
     TOLERATED = "tolerated"  # another acceptable status (e.g. a clean refusal on a limit case)
-    FAILED = "failed"  # wrong status, forbidden content, or an article outside the expectation
+    FAILED = "failed"  # wrong status or forbidden content
     ERROR = "error"  # the language model could not be reached: nothing to judge
+    REVIEW = "review"  # right status and complete, but cites an article nobody listed: read it
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,19 +63,21 @@ def score_answer(question: EvalQuestion, answer: Answer) -> AnswerScore:
     as_expected = answer.status == question.expected_status
     tolerated = not as_expected and answer.status == question.tolerated_status
 
-    if unexpected or forbidden or not (as_expected or tolerated):
+    if forbidden or not (as_expected or tolerated):
         return AnswerScore(Verdict.FAILED, (), (), unexpected, forbidden)
     if tolerated:
-        return AnswerScore(Verdict.TOLERATED)
+        return AnswerScore(Verdict.REVIEW if unexpected else Verdict.TOLERATED, (), (), unexpected)
     if question.expected_status == "refused":
-        return AnswerScore(Verdict.OK)
+        return AnswerScore(Verdict.REVIEW if unexpected else Verdict.OK, (), (), unexpected)
 
     missing_facts = tuple(
         tuple(group) for group in question.facts if not fact_present(group, answer.text)
     )
     missing_citations = tuple(a for a in question.expected_articles if a not in cited)
     if missing_facts or missing_citations:
-        return AnswerScore(Verdict.PARTIAL, missing_facts, missing_citations)
+        return AnswerScore(Verdict.PARTIAL, missing_facts, missing_citations, unexpected)
+    if unexpected:
+        return AnswerScore(Verdict.REVIEW, (), (), unexpected)
     return AnswerScore(Verdict.OK)
 
 

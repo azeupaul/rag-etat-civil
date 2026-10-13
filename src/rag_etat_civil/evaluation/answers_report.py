@@ -14,6 +14,7 @@ Results = Sequence[tuple[RunConfig, Sequence[QuestionRun]]]
 LABELS = {
     Verdict.OK: "OK",
     Verdict.PARTIAL: "partiel",
+    Verdict.REVIEW: "à relire",
     Verdict.TOLERATED: "toléré",
     Verdict.FAILED: "ÉCHEC",
     Verdict.ERROR: "erreur",
@@ -75,7 +76,8 @@ def _problems(run: QuestionRun) -> list[str]:
     if score.missing_citations:
         lines.append(f"- Articles attendus non cités : {_numbers(score.missing_citations)}")
     if score.unexpected_citations:
-        lines.append(f"- Articles cités hors périmètre : {_numbers(score.unexpected_citations)}")
+        extra = _numbers(score.unexpected_citations)
+        lines.append(f"- Articles cités hors liste (à relire) : {extra}")
     if score.forbidden_hits:
         lines.append(f"- Motifs interdits trouvés : {', '.join(score.forbidden_hits)}")
     return lines
@@ -112,9 +114,10 @@ def render_answers_report(results: Results) -> str:
         "## Comparaison des configurations",
         "",
         "OK : bon statut, tous les faits et tous les articles attendus cités. Partiel : bon "
-        "statut mais il manque un fait ou un article. Toléré : autre statut acceptable "
-        "(refus propre sur un cas limite). ÉCHEC : mauvais statut, motif interdit ou article "
-        "hors périmètre. Erreur : le modèle de langage n'a pas répondu.",
+        "statut mais il manque un fait ou un article. À relire : réponse complète "
+        "mais citant un article que personne n'a listé ; un humain vérifie s'il est pertinent. "
+        "Toléré : autre statut acceptable (refus propre sur un cas limite). ÉCHEC : mauvais "
+        "statut ou motif interdit. Erreur : le modèle de langage n'a pas répondu.",
         "",
         *_comparison(results),
         "",

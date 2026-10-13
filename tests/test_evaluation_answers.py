@@ -69,10 +69,17 @@ def test_an_accepted_extra_article_is_not_a_problem():
     assert score_answer(question(), answered(COMPLETE, 10, 11, 12)).verdict is Verdict.OK
 
 
-def test_an_article_outside_the_expectation_fails():
+def test_an_unlisted_article_on_a_complete_answer_is_left_to_review():
     score = score_answer(question(), answered(COMPLETE, 10, 12, 99))
 
-    assert score.verdict is Verdict.FAILED
+    assert score.verdict is Verdict.REVIEW
+    assert score.unexpected_citations == (99,)
+
+
+def test_an_incomplete_answer_stays_partial_even_with_an_unlisted_article():
+    score = score_answer(question(), answered("Dans les 90 jours.", 10, 99))
+
+    assert score.verdict is Verdict.PARTIAL
     assert score.unexpected_citations == (99,)
 
 
@@ -114,14 +121,14 @@ def test_an_answer_to_a_question_to_refuse_fails():
     assert score_answer(refusal_question(), answered("Voici.", 10)).verdict is Verdict.FAILED
 
 
-def test_a_tolerated_answer_must_stay_within_the_accepted_articles():
+def test_a_tolerated_answer_with_an_unlisted_article_is_left_to_review():
     q = refusal_question(tolerated_status="answered", also_accepted_articles=[1])
 
     fine = score_answer(q, answered("La loi ne le précise pas (article 1).", 1))
     wrong = score_answer(q, answered("Voici.", 55))
 
     assert fine.verdict is Verdict.TOLERATED
-    assert wrong.verdict is Verdict.FAILED
+    assert wrong.verdict is Verdict.REVIEW
 
 
 def test_a_tolerated_answer_still_fails_on_a_forbidden_pattern():
