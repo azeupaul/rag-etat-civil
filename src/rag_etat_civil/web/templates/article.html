@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{% if article %}Article {{ article.number }}{% else %}Article introuvable{% endif %} : loi 2024/016{% endblock %}
+
+{% block content %}
+<p><a href="{{ url_for('index') }}">← Poser une question</a></p>
+
+{% if article %}
+<article class="card">
+  <h2>Article {{ article.number }}</h2>
+  {% if article.breadcrumb %}
+  <p class="muted">{{ article.breadcrumb | join(" › ") }}</p>
+  {% endif %}
+  <p class="article-text">{{ article.text }}</p>
+  <p class="muted">
+    {% if article.page_start == article.page_end %}Page {{ article.page_start }}{% else %}Pages {{ article.page_start }} à {{ article.page_end }}{% endif %}
+    du PDF officiel. Transcription non officielle : vérifiez le texte dans la
+    <a href="{{ official_source_url }}" rel="noopener noreferrer">copie publiée par la Présidence de la République</a>.
+  </p>
+</article>
+{% else %}
+<p class="card card-error" role="alert">{{ error }}</p>
+{% endif %}
+{% endblock %}

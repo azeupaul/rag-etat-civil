@@ -1,5 +1,20 @@
 <article class="card">
-  <h2>Question reçue</h2>
+  <h2>Question</h2>
   <p class="question">{{ question }}</p>
-  <p class="muted">Le moteur de recherche n'est pas encore branché : la réponse avec les articles cités arrive aux prochaines étapes du projet.</p>
+
+  <h2>Réponse</h2>
+  {% if answer.status == "answered" %}
+  <p class="answer-text">{{ answer.text }}</p>
+  <h3>Articles cités</h3>
+  <ul class="citations">
+    {% for citation in answer.citations %}
+    <li>
+      <a href="{{ url_for('article_page', number=citation.article) }}">Article {{ citation.article }}</a>
+      <span class="muted">(page {{ citation.page }} du PDF officiel)</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="answer-text">{{ answer.text }}</p>
+  {% endif %}
 </article>

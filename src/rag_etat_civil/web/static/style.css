@@ -241,6 +241,23 @@ button:disabled {
   color: var(--muted);
 }
 
+.answer-text,
+.article-text {
+  margin: 0 0 0.75rem;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.card h3 {
+  margin: 1rem 0 0.25rem;
+  font-size: 1rem;
+}
+
+.citations {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .htmx-indicator {
     transition: opacity 150ms ease-in;
