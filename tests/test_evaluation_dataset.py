@@ -2,6 +2,7 @@ import json
 
 import pytest
 from pydantic import ValidationError
+
 from rag_etat_civil.evaluation.dataset import EvalQuestion, load_questions
 
 

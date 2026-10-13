@@ -4,8 +4,8 @@ import re
 from pathlib import Path
 
 import pytest
-from rag_etat_civil.evaluation.dataset import load_questions
 
+from rag_etat_civil.evaluation.dataset import load_questions
 from rag_etat_civil.ingestion.build import load_articles
 
 ROOT = Path(__file__).resolve().parent.parent
