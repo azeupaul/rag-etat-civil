@@ -13,6 +13,10 @@ construit à partir du seul texte public de la loi, sans aucune donnée, code ni
 État : en construction. La recherche des passages de la loi fonctionne (voir ci-dessous) ;
 la génération des réponses, l'API et l'interface complète arrivent aux étapes suivantes.
 
+## Aperçu
+
+![Réponse de l'assistant à la question « Qu'est-ce que le NIPU ? », avec les articles 3 et 81 cités](docs/screenshots/nipu-hd.png)
+
 ## Démarrage
 
 Prérequis : [uv](https://docs.astral.sh/uv/) et Python 3.12.
@@ -31,6 +35,18 @@ make search q="dans quel délai déclarer une naissance ?"
 `.cache/models`) puis calcule un vecteur par passage. Sur un processeur sans carte graphique,
 comptez de quelques minutes à une vingtaine de minutes. L'index est un fichier généré, il n'est
 pas versionné ; il est à refaire si le texte ou le modèle change.
+
+Les captures de `docs/screenshots/` sont produites par `scripts/capture_screenshot.py`, avec
+l'application lancée (`make run`) dans un autre terminal :
+
+```bash
+uv run python scripts/capture_screenshot.py -q "Qu'est-ce que le NIPU ?" --name nipu
+```
+
+Le script pose la question dans la page, attend la réponse et ses citations, puis écrit
+`<name>-hd.png` (en-tête, formulaire et réponse, en ×2) et `<name>-linkedin.png` (titre et
+réponse, 1200x627 px). Il n'écrit rien si le modèle de langage échoue ou si l'assistant refuse de
+répondre.
 
 ## Comment fonctionne la recherche
 
@@ -68,7 +84,8 @@ refaire l'index ; une incohérence est détectée et signalée au chargement.
 data/raw/           texte de la loi (transcription) et fiche de source
 data/processed/     articles et passages générés (`make ingest`)
 data/index/         index vectoriel généré (`make index`, non versionné)
-docs/               vérification de la transcription
+docs/               vérification de la transcription, captures d'écran
+scripts/            capture d'écran de l'application (Playwright)
 src/rag_etat_civil/
   ingestion/        texte -> articles -> passages
   embeddings/       interface Embedder, implémentation fastembed, registre
